@@ -1,33 +1,40 @@
 import { useState } from "react";
 
-const useValidateInputs = (emailValue, passwordValue) => {
+const useValidateInputs = () => {
   const [emailError, setEmailError] = useState(false);
   const [emailErrorMessage, setEmailErrorMessage] = useState("");
   const [passwordError, setPasswordError] = useState(false);
   const [passwordErrorMessage, setPasswordErrorMessage] = useState("");
 
-  let isValid = true;
+  // Accept emailValue and passwordValue instead of refs
+  const validateInputs = (emailValue, passwordValue) => {
+    let isValid = true;
 
-  if (!emailValue || !/\S+@\S+\.\S+/.test(emailValue)) {
-    setEmailError(true);
-    setEmailErrorMessage("Please enter a valid email address.");
-    isValid = false;
-  } else {
-    setEmailError(false);
-    setEmailErrorMessage("");
-  }
+    // Validate email
+    if (!emailValue || !/\S+@\S+\.\S+/.test(emailValue)) {
+      setEmailError(true);
+      setEmailErrorMessage("Please enter a valid email address.");
+      isValid = false;
+    } else {
+      setEmailError(false);
+      setEmailErrorMessage("");
+    }
 
-  if (!passwordValue || passwordValue.length < 6) {
-    setPasswordError(true);
-    setPasswordErrorMessage("Password must be at least 6 characters long.");
-    isValid = false;
-  } else {
-    setPasswordError(false);
-    setPasswordErrorMessage("");
-  }
+    // Validate password
+    if (!passwordValue || passwordValue.length < 6) {
+      setPasswordError(true);
+      setPasswordErrorMessage("Password must be at least 6 characters long.");
+      isValid = false;
+    } else {
+      setPasswordError(false);
+      setPasswordErrorMessage("");
+    }
+
+    return isValid;
+  };
 
   return {
-    isValid,
+    validateInputs,
     emailError,
     emailErrorMessage,
     passwordError,

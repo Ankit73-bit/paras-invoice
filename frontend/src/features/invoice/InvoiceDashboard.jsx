@@ -1,6 +1,6 @@
 import Header from "../../ui/Header";
 
-function Invoice() {
+function InvoiceDashboard() {
   return (
     <>
       <Header />
@@ -8,4 +8,4 @@ function Invoice() {
   );
 }
 
-export default Invoice;
+export default InvoiceDashboard;
