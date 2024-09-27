@@ -1,29 +1,22 @@
-import Box from "@mui/material/Box";
-import Button from "@mui/material/Button";
-import Checkbox from "@mui/material/Checkbox";
-import CssBaseline from "@mui/material/CssBaseline";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Divider from "@mui/material/Divider";
+import {
+  Box,
+  Button,
+  CssBaseline,
+  Divider,
+  Stack,
+  Typography,
+  Checkbox,
+  FormControlLabel,
+} from "@mui/material";
+import { styled } from "@mui/material/styles";
+import Header from "../../ui/Header";
+import { GoogleIcon } from "./CustomIcons";
+import useAuthForm from "./useAuthForm";
+import { useState } from "react";
 import FormLabel from "@mui/material/FormLabel";
 import FormControl from "@mui/material/FormControl";
 import TextField from "@mui/material/TextField";
-import Typography from "@mui/material/Typography";
-import Stack from "@mui/material/Stack";
 import MuiCard from "@mui/material/Card";
-import { GoogleIcon } from "./CustomIcons";
-import { styled } from "@mui/material/styles";
-import Header from "../../ui/Header";
-import { useRef, useState } from "react";
-import useValidateInputs from "./useValidateInputs";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  updateProfile,
-} from "firebase/auth";
-import { auth } from "./firebase";
-import { useNavigate } from "react-router";
-import { useDispatch } from "react-redux";
-import { addUser } from "./userSlice";
 
 const Card = styled(MuiCard)(({ theme }) => ({
   display: "flex",
@@ -65,76 +58,18 @@ const SignInContainer = styled(Stack)(({ theme }) => ({
 
 export default function SignInUser() {
   const [isSignIn, setIsSignIn] = useState(true);
-  const [errormessage, setErrorMeassage] = useState(null);
-  const navigate = useNavigate();
-  const dispatch = useDispatch();
-
-  function handleSignUpClick() {
-    setIsSignIn(!isSignIn);
-  }
-
-  const name = useRef(null);
-  const email = useRef(null);
-  const password = useRef(null);
-
   const {
-    validateInputs,
+    handleSubmit,
+    nameRef,
+    emailRef,
+    passwordRef,
     emailError,
     emailErrorMessage,
     passwordError,
     passwordErrorMessage,
-  } = useValidateInputs(email, password);
-
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    // Extract the values from refs
-    const emailValue = email.current.value;
-    const passwordValue = password.current.value;
-
-    if (!validateInputs(emailValue, passwordValue)) return;
-
-    // Check for validation
-    if (validateInputs(emailValue, passwordValue) && !isSignIn) {
-      // SignUp Logic
-      createUserWithEmailAndPassword(auth, emailValue, passwordValue)
-        .then((userCredential) => {
-          // Signed up
-          const user = userCredential.user;
-          const nameValue = name.current.value;
-
-          updateProfile(user, {
-            displayName: nameValue,
-          })
-            .then(() => {
-              const { uid, email, displayName } = auth.currentUser;
-              dispatch(addUser({ uid, email, displayName }));
-            })
-            .catch((error) => {
-              console.log(error);
-            });
-          navigate("/invoice-dashboard");
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorMeassage(errorCode + " " + errorMessage);
-        });
-    } else {
-      // SignIn Logic
-      signInWithEmailAndPassword(auth, emailValue, passwordValue)
-        .then((userCredential) => {
-          // Signed in
-          const user = userCredential.user;
-          navigate("/invoice-dashboard");
-          // console.log(user);
-        })
-        .catch((error) => {
-          const errorCode = error.code;
-          const errorMessage = error.message;
-          setErrorMeassage(errorCode + " " + errorMessage);
-        });
-    }
-  };
+    errorMessage,
+    toggleSignIn,
+  } = useAuthForm(isSignIn, setIsSignIn);
 
   return (
     <>
@@ -164,7 +99,7 @@ export default function SignInUser() {
               <FormControl>
                 <FormLabel htmlFor="name">Name</FormLabel>
                 <TextField
-                  inputRef={name}
+                  inputRef={nameRef}
                   id="name"
                   type="name"
                   name="name"
@@ -180,7 +115,7 @@ export default function SignInUser() {
             <FormControl>
               <FormLabel htmlFor="email">Email</FormLabel>
               <TextField
-                inputRef={email}
+                inputRef={emailRef}
                 error={emailError}
                 helperText={emailErrorMessage}
                 id="email"
@@ -199,7 +134,7 @@ export default function SignInUser() {
             <FormControl>
               <FormLabel htmlFor="password">Password</FormLabel>
               <TextField
-                inputRef={password}
+                inputRef={passwordRef}
                 error={passwordError}
                 helperText={passwordErrorMessage}
                 name="password"
@@ -214,7 +149,7 @@ export default function SignInUser() {
                 color={passwordError ? "error" : "primary"}
               />
             </FormControl>
-            <Typography className="text-red-500">{errormessage}</Typography>
+            <Typography className="text-red-500">{errorMessage}</Typography>
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
@@ -224,10 +159,12 @@ export default function SignInUser() {
             </Button>
             <Typography
               sx={{ textAlign: "center" }}
-              onClick={handleSignUpClick}
+              onClick={toggleSignIn}
               className="cursor-pointer"
             >
-              Don&apos;t have an account?{" "}
+              <span>
+                {isSignIn ? "Don't have an account?" : "Already a user?"}{" "}
+              </span>
               <span className="text-blue-600">
                 {isSignIn ? "Sign up" : "Sign in"}
               </span>

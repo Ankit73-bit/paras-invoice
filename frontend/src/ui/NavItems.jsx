@@ -1,31 +1,65 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { auth } from "../features/authentication/firebase";
-import { signOut } from "firebase/auth";
 import { useSelector } from "react-redux";
+import { getName } from "../utils/helpers";
+import { handleSignOut } from "../features/authentication/authentication";
+import MenuItem from "@mui/material/MenuItem";
+import IconButton from "@mui/material/IconButton";
+import Typography from "@mui/material/Typography";
+import Box from "@mui/material/Box";
+import Menu from "@mui/material/Menu";
+import { useState } from "react";
 
 function NavItems() {
-  const navigate = useNavigate();
-  const name = useSelector((store) => store.user);
+  const [anchorElUser, setAnchorElUser] = useState(null);
 
-  function handleSignOut() {
-    signOut(auth)
-      .then(() => {
-        // Sign-out successful.
-        navigate("/signin");
-      })
-      .catch((error) => {
-        console.log(error);
-      });
-  }
+  const handleOpenUserMenu = (event) => {
+    setAnchorElUser(event.currentTarget);
+  };
+
+  const handleCloseUserMenu = () => {
+    setAnchorElUser(null);
+  };
+
+  const name = useSelector((store) => store.user);
+  const firstName = getName(name?.displayName);
 
   return (
     <>
       {auth.currentUser ? (
         <>
-          <li className="mr-10 cursor-pointer" onClick={handleSignOut}>
-            Logout
+          <li className="mr-5">
+            <Box sx={{ flexGrow: 0 }}>
+              <IconButton onClick={handleOpenUserMenu} sx={{ p: 1 }}>
+                <span className="text-lg font-bold">{firstName}</span>
+              </IconButton>
+              <Menu
+                sx={{ mt: "45px" }}
+                id="menu-appbar"
+                anchorEl={anchorElUser}
+                anchorOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                keepMounted
+                transformOrigin={{
+                  vertical: "top",
+                  horizontal: "right",
+                }}
+                open={Boolean(anchorElUser)}
+                onClose={handleCloseUserMenu}
+              >
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Typography sx={{ textAlign: "center" }}>Profile</Typography>
+                </MenuItem>
+                <MenuItem onClick={handleCloseUserMenu}>
+                  <Typography sx={{ textAlign: "center" }}>
+                    <span onClick={handleSignOut}>Logout</span>
+                  </Typography>
+                </MenuItem>
+              </Menu>
+            </Box>
           </li>
-          <li className="mr-10">{name?.displayName}</li>
         </>
       ) : (
         <li className="mr-10">
