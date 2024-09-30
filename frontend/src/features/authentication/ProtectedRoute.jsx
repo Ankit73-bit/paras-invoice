@@ -2,7 +2,7 @@ import { useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
 
 const ProtectedRoute = ({ children }) => {
-  const user = useSelector((state) => state.user); // Assuming user is stored in Redux
+  const user = useSelector((state) => state.user);
 
   // If no user, redirect to signin
   if (!user) {

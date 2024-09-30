@@ -16,7 +16,7 @@ const BasicModal = ({ open, setOpen }) => {
         <Sheet
           variant="plain"
           sx={{ borderRadius: "md", p: 3, boxShadow: "lg" }}
-          className="w-3/4 md:w-3/4 lg:1/2 bg-transparent"
+          className="w-3/4 md:w-3/4 lg:1/2"
         >
           <ModalClose variant="plain" />
           <InvoiceTemplate />
